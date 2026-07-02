@@ -15,6 +15,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       //  Refuser la connexion
       return false;
     },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
   },
   pages: {
     signIn: "/login",
