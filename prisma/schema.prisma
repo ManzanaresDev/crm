@@ -3,23 +3,34 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // ou "sqlite" pour tester en local
-  url      = env("DATABASE_URL")
+  provider  = "postgresql" // ou "sqlite" pour tester en local
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
+// ─────────────────────────────
+// AUTH
+// ─────────────────────────────
+
 model User {
-  id        String    @id @default(cuid())
-  name      String?
-  email     String    @unique
-  password  String
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String?
   emailVerified DateTime?
   image         String?
-  createdAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+
   accounts      Account[]
   sessions      Session[]
-  contacts  Contact[]
-  deals     Deal[]
+
+  contacts      Contact[]
+  deals         Deal[]
+  appointments  Appointment[]
+  tasks         Task[]
+  emailLogs     EmailLog[]
+  activities    Activity[]
+  campaigns     EmailCampaign[]
 }
 
 model Account {
@@ -46,7 +57,8 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -57,36 +69,252 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// ─────────────────────────────
+// ENUMS
+// ─────────────────────────────
+
+enum ContactStatus {
+  LEAD
+  CLIENT
+  INACTIF
+}
+
+enum DealStage {
+  NOUVEAU
+  EN_COURS
+  GAGNE
+  PERDU
+}
+
+enum AppointmentStatus {
+  PLANIFIE
+  CONFIRME
+  ANNULE
+  TERMINE
+}
+
+enum TaskType {
+  RELANCE
+  APPEL
+  EMAIL
+  AUTRE
+}
+
+enum EmailStatus {
+  EN_ATTENTE
+  ENVOYE
+  OUVERT
+  CLIQUE
+  ECHOUE
+}
+
+enum CampaignStatus {
+  BROUILLON
+  PLANIFIEE
+  EN_COURS
+  TERMINEE
+  ANNULEE
+}
+
+enum ActivityType {
+  APPEL
+  NOTE
+  EMAIL
+  CHANGEMENT_STAGE
+  RENDEZ_VOUS
+  TACHE
+}
+
+// ─────────────────────────────
+// CORE CRM
+// ─────────────────────────────
+
 model Contact {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   firstName String
   lastName  String
   email     String?
   phone     String?
   company   String?
-  status    String   @default("lead") // lead, client, inactif
+  status    ContactStatus @default(LEAD)
   notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
-  owner     User     @relation(fields: [ownerId], references: [id])
+  owner     User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId   String
 
-  deals     Deal[]
+  deals         Deal[]
+  appointments  Appointment[]
+  tasks         Task[]
+  emailLogs     EmailLog[]
+  activities    Activity[]
+  campaignSends CampaignRecipient[]
+
+  @@index([ownerId])
+  @@index([status])
 }
 
 model Deal {
+  id          String    @id @default(cuid())
+  title       String
+  amount      Decimal   @default(0) @db.Decimal(10, 2)
+  stage       DealStage @default(NOUVEAU)
+  closingDate DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  contact     Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId   String
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String
+
+  appointments Appointment[]
+  tasks        Task[]
+  activities   Activity[]
+
+  @@index([ownerId])
+  @@index([stage])
+  @@index([contactId])
+}
+
+// ─────────────────────────────
+// AGENDA
+// ─────────────────────────────
+
+model Appointment {
+  id          String             @id @default(cuid())
+  title       String
+  description String?
+  startsAt    DateTime
+  endsAt      DateTime
+  location    String?            // adresse ou lien visio
+  status      AppointmentStatus  @default(PLANIFIE)
+
+  contact     Contact?           @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  contactId   String?
+  deal        Deal?              @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  dealId      String?
+  owner       User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String
+
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([ownerId])
+  @@index([startsAt])
+  @@index([contactId])
+}
+
+// ─────────────────────────────
+// RELANCES / TÂCHES
+// ─────────────────────────────
+
+model Task {
   id          String   @id @default(cuid())
   title       String
-  amount      Float    @default(0)
-  stage       String   @default("nouveau") // nouveau, en_cours, gagne, perdu
-  closingDate DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  description String?
+  dueDate     DateTime
+  done        Boolean  @default(false)
+  doneAt      DateTime?
+  type        TaskType @default(RELANCE)
 
-  contact     Contact  @relation(fields: [contactId], references: [id])
+  contact     Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  contactId   String?
+  deal        Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  dealId      String?
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String
+
+  createdAt   DateTime @default(now())
+
+  @@index([ownerId, done, dueDate])
+  @@index([contactId])
+}
+
+// ─────────────────────────────
+// MAILING — envois individuels (log)
+// ─────────────────────────────
+
+model EmailLog {
+  id        String      @id @default(cuid())
+  subject   String
+  body      String      @db.Text
+  status    EmailStatus @default(EN_ATTENTE)
+  sentAt    DateTime?
+  openedAt  DateTime?
+
+  contact   Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId String
+  owner     User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String
+
+  createdAt DateTime    @default(now())
+
+  @@index([ownerId])
+  @@index([contactId])
+}
+
+// ─────────────────────────────
+// MAILING — campagnes automatisées
+// ─────────────────────────────
+
+model EmailCampaign {
+  id          String         @id @default(cuid())
+  name        String
+  subject     String
+  body        String         @db.Text
+  status      CampaignStatus @default(BROUILLON)
+  scheduledAt DateTime?      // envoi programmé
+  sentAt      DateTime?
+
+  owner       User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String
+
+  recipients  CampaignRecipient[]
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+// Table de liaison : qui a reçu quelle campagne + tracking individuel
+model CampaignRecipient {
+  id          String      @id @default(cuid())
+  status      EmailStatus @default(EN_ATTENTE)
+  sentAt      DateTime?
+  openedAt    DateTime?
+  clickedAt   DateTime?
+
+  campaign    EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId  String
+  contact     Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
   contactId   String
 
-  owner       User     @relation(fields: [ownerId], references: [id])
-  ownerId     String
+  @@unique([campaignId, contactId])
+  @@index([contactId])
+}
+
+// ─────────────────────────────
+// HISTORIQUE D'ACTIVITÉ (fil par contact/deal)
+// ─────────────────────────────
+
+model Activity {
+  id        String       @id @default(cuid())
+  type      ActivityType
+  content   String       @db.Text
+  createdAt DateTime     @default(now())
+
+  contact   Contact?     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId String?
+  deal      Deal?        @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId    String?
+  owner     User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String
+
+  @@index([contactId])
+  @@index([dealId])
+  @@index([ownerId])
 }
