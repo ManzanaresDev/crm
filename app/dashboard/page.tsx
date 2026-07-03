@@ -122,7 +122,7 @@ export default async function DashboardPage() {
           <div className="flex justify-between items-center mb-3">
             <h2 className="font-semibold">Contacts récents</h2>
             <Link
-              href="/contacts"
+              href="/dashboard/contacts"
               className="text-sm text-blue-600 hover:underline"
             >
               Voir tout
@@ -163,7 +163,7 @@ export default async function DashboardPage() {
           <div className="flex justify-between items-center mb-3">
             <h2 className="font-semibold">Opportunités en cours</h2>
             <Link
-              href="/deals"
+              href="/dashboard/deals"
               className="text-sm text-blue-600 hover:underline"
             >
               Voir le pipeline
@@ -203,7 +203,7 @@ export default async function DashboardPage() {
           <div className="flex justify-between items-center mb-3">
             <h2 className="font-semibold">Prochains rendez-vous</h2>
             <Link
-              href="/appointments"
+              href="/dashboard/appointments"
               className="text-sm text-blue-600 hover:underline"
             >
               Voir l&apos;agenda
@@ -247,7 +247,7 @@ export default async function DashboardPage() {
           <div className="flex justify-between items-center mb-3">
             <h2 className="font-semibold">Tâches à faire</h2>
             <Link
-              href="/tasks"
+              href="/dashboard/tasks"
               className="text-sm text-blue-600 hover:underline"
             >
               Voir tout
