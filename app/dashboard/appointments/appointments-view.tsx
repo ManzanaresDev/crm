@@ -1,4 +1,4 @@
-// src/app/appointments/appointments-view.tsx
+// app/appointments/appointments-view.tsx
 "use client";
 
 import { useState } from "react";
@@ -22,26 +22,40 @@ export function AppointmentsView({ events }: { events: AppointmentEvent[] }) {
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <div className="inline-flex border rounded-lg overflow-hidden">
+      <div className="mb-4 flex justify-end">
+        <div
+          className="inline-flex overflow-hidden rounded-lg p-1"
+          style={{
+            background: "rgba(226, 232, 240, 0.06)",
+            border: "1px solid rgba(226, 232, 240, 0.14)",
+          }}
+        >
           <button
             onClick={() => setMode("calendar")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm ${
+            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all"
+            style={
               mode === "calendar"
-                ? "bg-blue-600 text-white"
-                : "bg-white text-gray-600 hover:bg-gray-50"
-            }`}
+                ? {
+                    background: "linear-gradient(135deg, #22d3ee, #0891b2)",
+                    color: "#04121f",
+                  }
+                : { color: "#94a3b8" }
+            }
           >
             <CalendarDays size={16} />
             Calendrier
           </button>
           <button
             onClick={() => setMode("list")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border-l ${
+            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all"
+            style={
               mode === "list"
-                ? "bg-blue-600 text-white"
-                : "bg-white text-gray-600 hover:bg-gray-50"
-            }`}
+                ? {
+                    background: "linear-gradient(135deg, #22d3ee, #0891b2)",
+                    color: "#04121f",
+                  }
+                : { color: "#94a3b8" }
+            }
           >
             <List size={16} />
             Liste

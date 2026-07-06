@@ -311,7 +311,7 @@ h1 {
 }
 
 /* Appointments calendar */
-.rbc-dark-theme .rbc-calendar {
+/* .rbc-dark-theme .rbc-calendar {
   color: #e2e8f0;
 }
 .rbc-dark-theme .rbc-toolbar button {
@@ -361,4 +361,4 @@ h1 {
 }
 .rbc-dark-theme .rbc-agenda-table tbody tr:hover {
   background: rgba(226, 232, 240, 0.05);
-}
+} */

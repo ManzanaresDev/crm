@@ -1,3 +1,4 @@
+// app/dashboard/appointments/status-styles.ts
 export const STATUS_STYLES: Record<
   string,
   { label: string; color: string; bg: string; border: string }

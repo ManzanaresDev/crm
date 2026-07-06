@@ -1,4 +1,4 @@
-// src/app/appointments/page.tsx
+// app/appointments/page.tsx
 import { db } from "@/lib/database";
 import { requireSession } from "@/lib/require-session";
 import { AppointmentsView } from "./appointments-view";
