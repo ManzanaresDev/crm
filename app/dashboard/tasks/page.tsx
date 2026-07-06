@@ -2,6 +2,37 @@
 import { db } from "@/lib/database";
 import { requireSession } from "@/lib/require-session";
 import { createTask, toggleTaskDone } from "./actions";
+import { PageHeader } from "@/components/ui/PageHeader";
+
+const TYPE_STYLES: Record<
+  string,
+  { label: string; bg: string; color: string; border: string }
+> = {
+  RELANCE: {
+    label: "Relance",
+    bg: "rgba(251,191,36,0.14)",
+    color: "#fbbf24",
+    border: "rgba(251,191,36,0.3)",
+  },
+  APPEL: {
+    label: "Appel",
+    bg: "rgba(34,211,238,0.14)",
+    color: "#22d3ee",
+    border: "rgba(34,211,238,0.3)",
+  },
+  EMAIL: {
+    label: "Email",
+    bg: "rgba(167,139,250,0.14)",
+    color: "#a78bfa",
+    border: "rgba(167,139,250,0.3)",
+  },
+  AUTRE: {
+    label: "Autre",
+    bg: "rgba(148,163,184,0.14)",
+    color: "#94a3b8",
+    border: "rgba(148,163,184,0.3)",
+  },
+};
 
 export default async function TasksPage() {
   const session = await requireSession();
@@ -22,41 +53,28 @@ export default async function TasksPage() {
     }),
   ]);
 
-  const typeLabels: Record<string, string> = {
-    RELANCE: "Relance",
-    APPEL: "Appel",
-    EMAIL: "Email",
-    AUTRE: "Autre",
-  };
-
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Tâches</h1>
+    <div className="min-h-screen p-6 md:p-10">
+      <PageHeader title="Tâches" />
 
-      <form action={createTask} className="flex flex-wrap gap-2 mb-6">
+      <form
+        action={createTask}
+        className="glass-panel mb-8 flex flex-wrap gap-3 p-5"
+      >
         <input
           name="title"
           placeholder="Titre"
           required
-          className="border p-2 rounded"
+          className="glass-input min-w-[160px] flex-1"
         />
-        <input
-          name="dueDate"
-          type="date"
-          required
-          className="border p-2 rounded"
-        />
-        <select
-          name="type"
-          className="border p-2 rounded"
-          defaultValue="RELANCE"
-        >
+        <input name="dueDate" type="date" required className="glass-input" />
+        <select name="type" className="glass-input" defaultValue="RELANCE">
           <option value="RELANCE">Relance</option>
           <option value="APPEL">Appel</option>
           <option value="EMAIL">Email</option>
           <option value="AUTRE">Autre</option>
         </select>
-        <select name="contactId" className="border p-2 rounded">
+        <select name="contactId" className="glass-input">
           <option value="">— Contact —</option>
           {contacts.map((c) => (
             <option key={c.id} value={c.id}>
@@ -64,7 +82,7 @@ export default async function TasksPage() {
             </option>
           ))}
         </select>
-        <select name="dealId" className="border p-2 rounded">
+        <select name="dealId" className="glass-input">
           <option value="">— Deal —</option>
           {deals.map((d) => (
             <option key={d.id} value={d.id}>
@@ -72,10 +90,7 @@ export default async function TasksPage() {
             </option>
           ))}
         </select>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
+        <button type="submit" className="btn-primary">
           Ajouter
         </button>
       </form>
@@ -83,33 +98,34 @@ export default async function TasksPage() {
       <div className="grid gap-3">
         {tasks.map((t) => {
           const isLate = !t.done && t.dueDate < new Date();
+          const type = TYPE_STYLES[t.type] ?? TYPE_STYLES.AUTRE;
+
           return (
             <div
               key={t.id}
-              className={`border rounded p-4 flex justify-between items-center ${
-                t.done ? "opacity-60" : ""
+              className={`glass-panel flex items-center justify-between gap-4 p-4 ${
+                t.done ? "opacity-50" : ""
               }`}
             >
               <div className="flex items-start gap-3">
                 <form action={toggleTaskDone.bind(null, t.id, !t.done)}>
                   <button
                     type="submit"
-                    className={`mt-1 w-5 h-5 rounded border flex items-center justify-center text-xs ${
-                      t.done
-                        ? "bg-green-600 border-green-600 text-white"
-                        : "border-gray-300"
-                    }`}
+                    aria-label={t.done ? "Marquer non fait" : "Marquer fait"}
+                    className={`task-checkbox ${t.done ? "done" : ""}`}
                   >
-                    {t.done ? "✓" : ""}
+                    {t.done && (
+                      <span className="text-xs text-[#04121f]">✓</span>
+                    )}
                   </button>
                 </form>
                 <div>
                   <p
-                    className={`font-semibold ${t.done ? "line-through" : ""}`}
+                    className={`font-semibold text-slate-100 ${t.done ? "text-slate-500 line-through" : ""}`}
                   >
                     {t.title}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-slate-400">
                     {new Date(t.dueDate).toLocaleDateString("fr-FR")}
                     {t.contact &&
                       ` · ${t.contact.firstName} ${t.contact.lastName}`}
@@ -117,14 +133,20 @@ export default async function TasksPage() {
                   </p>
                 </div>
               </div>
+
               <span
-                className={`text-xs px-2 py-1 rounded ${
-                  isLate
-                    ? "bg-red-100 text-red-700"
-                    : "bg-gray-100 text-gray-600"
-                }`}
+                className="chip"
+                style={
+                  {
+                    "--chip-bg": isLate ? "rgba(251,113,133,0.16)" : type.bg,
+                    "--chip-color": isLate ? "#fb7185" : type.color,
+                    "--chip-border": isLate
+                      ? "rgba(251,113,133,0.35)"
+                      : type.border,
+                  } as React.CSSProperties
+                }
               >
-                {typeLabels[t.type] ?? t.type}
+                {isLate ? "En retard" : type.label}
               </span>
             </div>
           );

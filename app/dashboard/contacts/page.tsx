@@ -1,8 +1,10 @@
-// app/dashboard/contacts/page.tsx
 import { db } from "@/lib/database";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createContact } from "./actions";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { contactStatusStyle } from "./status-styles";
 
 export default async function ContactsPage() {
   const session = await auth();
@@ -14,65 +16,102 @@ export default async function ContactsPage() {
   });
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Contacts</h1>
+    <div className="min-h-screen p-6 md:p-10">
+      <PageHeader title="Contacts" />
 
-      <form action={createContact} className="flex gap-2 mb-6">
+      <form
+        action={createContact}
+        className="glass-panel mb-8 flex flex-wrap gap-3 p-5"
+      >
         <input
           name="firstName"
           placeholder="Prénom"
           required
-          className="border p-2 rounded"
+          className="glass-input min-w-[140px] flex-1"
         />
         <input
           name="lastName"
           placeholder="Nom"
           required
-          className="border p-2 rounded"
+          className="glass-input min-w-[140px] flex-1"
         />
         <input
           name="email"
           placeholder="Email"
           type="email"
-          className="border p-2 rounded"
+          className="glass-input min-w-[160px] flex-1"
         />
         <input
           name="phone"
           placeholder="Téléphone"
-          className="border p-2 rounded"
+          className="glass-input min-w-[140px]"
         />
         <input
           name="company"
           placeholder="Entreprise"
-          className="border p-2 rounded"
+          className="glass-input min-w-[160px] flex-1"
         />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
+        <button type="submit" className="btn-primary">
           Ajouter
         </button>
       </form>
 
       <div className="grid gap-3">
-        {contacts.map((c) => (
-          <div
-            key={c.id}
-            className="border rounded p-4 flex justify-between items-center"
-          >
-            <div>
-              <p className="font-semibold">
-                {c.firstName} {c.lastName}
-              </p>
-              <p className="text-sm text-gray-500">
-                {c.email} · {c.company}
-              </p>
-            </div>
-            <span className="text-xs px-2 py-1 rounded bg-gray-100">
-              {c.status}
-            </span>
-          </div>
-        ))}
+        {contacts.map((c) => {
+          const status = contactStatusStyle(c.status);
+          return (
+            <Link
+              key={c.id}
+              href={`/dashboard/contacts/${c.id}`}
+              className="flex items-center justify-between gap-4 rounded-xl p-4 transition-transform hover:-translate-y-0.5"
+              style={{
+                background: "rgba(226,232,240,0.06)",
+                border: "1px solid rgba(226,232,240,0.14)",
+                borderLeft: `3px solid ${status.color}`,
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                  style={{
+                    background: "rgba(34,211,238,0.14)",
+                    color: "#22d3ee",
+                  }}
+                >
+                  {c.firstName?.[0]}
+                  {c.lastName?.[0]}
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-100">
+                    {c.firstName} {c.lastName}
+                  </p>
+                  <p className="text-sm text-slate-400">
+                    {[c.email, c.company].filter(Boolean).join(" · ")}
+                  </p>
+                </div>
+              </div>
+
+              <span
+                className="chip shrink-0"
+                style={
+                  {
+                    "--chip-bg": status.bg,
+                    "--chip-color": status.color,
+                    "--chip-border": status.border,
+                  } as React.CSSProperties
+                }
+              >
+                {status.label}
+              </span>
+            </Link>
+          );
+        })}
+
+        {contacts.length === 0 && (
+          <p className="py-8 text-center text-sm text-slate-400">
+            Aucun contact pour l&apos;instant.
+          </p>
+        )}
       </div>
     </div>
   );

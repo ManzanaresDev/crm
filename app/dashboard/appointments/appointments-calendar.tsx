@@ -1,4 +1,3 @@
-// src/app/appointments/appointments-calendar.tsx
 "use client";
 
 import { Calendar, dateFnsLocalizer, View } from "react-big-calendar";
@@ -6,6 +5,7 @@ import { format, parse, startOfWeek, getDay } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useState, useMemo } from "react";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { STATUS_STYLES } from "./status-styles";
 
 const locales = { fr };
 
@@ -26,13 +26,6 @@ type AppointmentEvent = {
   location: string | null;
 };
 
-const statusColors: Record<string, string> = {
-  PLANIFIE: "#3b82f6",
-  CONFIRME: "#22c55e",
-  ANNULE: "#ef4444",
-  TERMINE: "#6b7280",
-};
-
 export function AppointmentsCalendar({
   events,
 }: {
@@ -40,7 +33,6 @@ export function AppointmentsCalendar({
 }) {
   const [view, setView] = useState<View>("week");
 
-  // react-big-calendar attend des objets Date natifs, pas des strings
   const calendarEvents = useMemo(
     () =>
       events.map((e) => ({
@@ -52,7 +44,7 @@ export function AppointmentsCalendar({
   );
 
   return (
-    <div style={{ height: "75vh" }}>
+    <div className="rbc-dark-theme" style={{ height: "75vh" }}>
       <Calendar
         localizer={localizer}
         events={calendarEvents}
@@ -72,13 +64,19 @@ export function AppointmentsCalendar({
           agenda: "Agenda",
           noEventsInRange: "Aucun rendez-vous sur cette période",
         }}
-        eventPropGetter={(event) => ({
-          style: {
-            backgroundColor: statusColors[event.status] ?? "#3b82f6",
-            borderRadius: "4px",
-            border: "none",
-          },
-        })}
+        eventPropGetter={(event) => {
+          const color = STATUS_STYLES[event.status]?.color ?? "#22d3ee";
+          return {
+            style: {
+              backgroundColor: color,
+              boxShadow: `0 0 8px ${color}80`,
+              borderRadius: "6px",
+              border: "none",
+              color: "#04121f",
+              fontWeight: 600,
+            },
+          };
+        }}
         tooltipAccessor={(event) =>
           event.location ? `${event.title} · ${event.location}` : event.title
         }

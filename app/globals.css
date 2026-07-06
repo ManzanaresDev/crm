@@ -9,6 +9,22 @@ body {
   padding: 0;
   font-family: "DM Sans", sans-serif;
   background: #0a1628;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "DM Sans", sans-serif;
+  min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(10, 22, 40, 0.85), rgba(10, 22, 40, 0.85)),
+    url("/images/crm-fond.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 * {
@@ -168,4 +184,181 @@ h1 {
   html {
     @apply font-sans;
   }
+}
+
+/* Cartes */
+.stat-card {
+  position: relative;
+  background: rgba(226, 232, 240, 0.09);
+  border: 1px solid rgba(226, 232, 240, 0.16);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--accent-color, #22d3ee);
+  box-shadow: 0 0 12px var(--accent-color, #22d3ee);
+  opacity: 0.7;
+  transition:
+    opacity 0.25s ease,
+    height 0.25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(226, 232, 240, 0.3);
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.5);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+  height: 4px;
+}
+
+.stat-value {
+  font-family: "IBM Plex Mono", "DM Sans", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767px) {
+  .stat-card {
+    background: rgba(226, 232, 240, 0.14);
+    border-color: rgba(226, 232, 240, 0.22);
+  }
+}
+
+/* Components reutilisables */
+.glass-panel {
+  background: rgba(226, 232, 240, 0.06);
+  border: 1px solid rgba(226, 232, 240, 0.14);
+  border-radius: 1rem;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.glass-input {
+  background: rgba(226, 232, 240, 0.06);
+  border: 1px solid rgba(226, 232, 240, 0.18);
+  color: #e2e8f0;
+  border-radius: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9rem;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+.glass-input::placeholder {
+  color: rgba(226, 232, 240, 0.4);
+}
+.glass-input:focus {
+  outline: none;
+  border-color: #22d3ee;
+  background: rgba(226, 232, 240, 0.1);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #22d3ee, #0891b2);
+  color: #04121f;
+  font-weight: 600;
+  border-radius: 0.6rem;
+  padding: 0.6rem 1.25rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -8px rgba(34, 211, 238, 0.6);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: var(--chip-bg, rgba(148, 163, 184, 0.14));
+  color: var(--chip-color, #94a3b8);
+  border: 1px solid var(--chip-border, rgba(148, 163, 184, 0.2));
+}
+
+.task-checkbox {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 0.4rem;
+  border: 1.5px solid rgba(226, 232, 240, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.task-checkbox.done {
+  background: linear-gradient(135deg, #34d399, #059669);
+  border-color: #34d399;
+}
+
+/* Appointments calendar */
+.rbc-dark-theme .rbc-calendar {
+  color: #e2e8f0;
+}
+.rbc-dark-theme .rbc-toolbar button {
+  color: #cbd5e1;
+  border-color: rgba(226, 232, 240, 0.18);
+  background: rgba(226, 232, 240, 0.05);
+}
+.rbc-dark-theme .rbc-toolbar button:hover,
+.rbc-dark-theme .rbc-toolbar button.rbc-active {
+  background: linear-gradient(135deg, #22d3ee, #0891b2);
+  color: #04121f;
+  border-color: transparent;
+}
+.rbc-dark-theme .rbc-toolbar-label {
+  color: #f1f5f9;
+  font-weight: 600;
+}
+.rbc-dark-theme .rbc-month-view,
+.rbc-dark-theme .rbc-time-view,
+.rbc-dark-theme .rbc-agenda-view {
+  border-color: rgba(226, 232, 240, 0.14);
+  background: rgba(226, 232, 240, 0.03);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+.rbc-dark-theme .rbc-header,
+.rbc-dark-theme .rbc-time-header-content,
+.rbc-dark-theme .rbc-time-gutter {
+  border-color: rgba(226, 232, 240, 0.12);
+  color: #94a3b8;
+  background: transparent;
+}
+.rbc-dark-theme .rbc-day-bg,
+.rbc-dark-theme .rbc-month-row,
+.rbc-dark-theme .rbc-day-slot,
+.rbc-dark-theme .rbc-timeslot-group {
+  border-color: rgba(226, 232, 240, 0.08);
+}
+.rbc-dark-theme .rbc-off-range-bg {
+  background: rgba(0, 0, 0, 0.2);
+}
+.rbc-dark-theme .rbc-today {
+  background: rgba(34, 211, 238, 0.08);
+}
+.rbc-dark-theme .rbc-agenda-table {
+  color: #e2e8f0;
+}
+.rbc-dark-theme .rbc-agenda-table tbody tr:hover {
+  background: rgba(226, 232, 240, 0.05);
 }

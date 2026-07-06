@@ -2,6 +2,7 @@
 import { db } from "@/lib/database";
 import { requireSession } from "@/lib/require-session";
 import { AppointmentsView } from "./appointments-view";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default async function AppointmentsPage() {
   const session = await requireSession();
@@ -12,8 +13,6 @@ export default async function AppointmentsPage() {
     include: { contact: true, deal: true },
   });
 
-  // Sérialisation : les Date/Decimal Prisma ne passent pas telles quelles
-  // du Server Component vers le Client Component
   const events = appointments.map((a) => ({
     id: a.id,
     title: a.title,
@@ -28,9 +27,11 @@ export default async function AppointmentsPage() {
   }));
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Rendez-vous</h1>
-      <AppointmentsView events={events} />
+    <div className="min-h-screen p-6 md:p-10">
+      <PageHeader title="Rendez-vous" />
+      <div className="glass-panel p-4">
+        <AppointmentsView events={events} />
+      </div>
     </div>
   );
 }
