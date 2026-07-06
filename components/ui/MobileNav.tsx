@@ -1,14 +1,22 @@
-// component/ui/MobileNav.tsx
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, User, Briefcase, Calendar, CheckSquare } from "lucide-react";
+import {
+  Menu,
+  X,
+  Users,
+  Briefcase,
+  Calendar,
+  CheckSquare,
+  LayoutDashboard,
+} from "lucide-react";
 
 const navItems = [
-  { label: "Contacts", href: "/dashboard/contacts", icon: User },
+  { label: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Contacts", href: "/dashboard/contacts", icon: Users },
   { label: "Deals", href: "/dashboard/deals", icon: Briefcase },
-  { label: "Agenda", href: "/dashboard/agenda", icon: Calendar },
+  { label: "Agenda", href: "/dashboard/appointments", icon: Calendar },
   { label: "Tâches", href: "/dashboard/taches", icon: CheckSquare },
 ];
 
@@ -18,51 +26,37 @@ export function MobileNav() {
   return (
     <div className="md:hidden">
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => setOpen(!open)}
+        className="p-2 rounded-full border border-slate-500/60 text-slate-300 hover:border-slate-300 hover:bg-white/5 transition-colors"
         aria-label="Ouvrir le menu"
-        className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-500/25 text-slate-100"
       >
-        <Menu size={22} />
+        {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </button>
 
       {open && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/40"
-            onClick={() => setOpen(false)}
-          />
-          <nav
-            className="fixed inset-y-0 left-0 z-50 w-64 border-r border-white/10 p-6"
-            style={{
-              background: "rgba(10, 22, 40, 0.78)",
-              backdropFilter: "blur(18px)",
-              WebkitBackdropFilter: "blur(18px)",
-            }}
-          >
-            <button
-              onClick={() => setOpen(false)}
-              aria-label="Fermer le menu"
-              className="mb-8 flex h-9 w-9 items-center justify-center rounded-lg text-slate-300"
-            >
-              <X size={20} />
+        <div className="fixed inset-0 z-50 bg-[#0b1220]">
+          <div className="flex justify-end p-4">
+            <button onClick={() => setOpen(false)} aria-label="Fermer">
+              <X className="h-6 w-6 text-slate-300" />
             </button>
-
-            <ul className="flex flex-col gap-1">
-              {navItems.map(({ label, href, icon: Icon }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-100 transition-colors hover:bg-white/10"
-                  >
-                    <Icon size={18} />
-                    <span>{label}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          </div>
+          <nav className="flex flex-col gap-1 px-4">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 rounded-lg px-3 py-4 text-xl font-medium text-slate-200 hover:bg-white/5"
+                >
+                  <Icon className="h-6 w-6" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </nav>
-        </>
+        </div>
       )}
     </div>
   );

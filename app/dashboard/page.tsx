@@ -1,6 +1,6 @@
+// app/dashboard/page.tsx
 import { db } from "@/lib/database";
 import { requireSession } from "@/lib/require-session";
-import { NavGrid } from "@/components/ui/NavGrid";
 import { MobileNav } from "@/components/ui/MobileNav";
 import { StatCard } from "@/components/ui/StartCard";
 import { Users, Target, Trophy, Wallet, AlertTriangle } from "lucide-react";
@@ -52,17 +52,7 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="hidden text-2xl font-bold md:block md:text-3xl">
-          Tableau de bord
-        </h1>
-        <MobileNav />
-        <div className="hidden md:block">
-          <NavGrid />
-        </div>
-      </div>
-
+    <div className="flex-1 p-6 md:p-10">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {cards.map((c) => (
           <StatCard key={c.label} {...c} />

@@ -2,7 +2,6 @@
 import { db } from "@/lib/database";
 import { requireSession } from "@/lib/require-session";
 import { AppointmentsView } from "./appointments-view";
-import { PageHeader } from "@/components/ui/PageHeader";
 
 export default async function AppointmentsPage() {
   const session = await requireSession();
@@ -28,7 +27,6 @@ export default async function AppointmentsPage() {
 
   return (
     <div className="min-h-screen p-6 md:p-10">
-      <PageHeader title="Rendez-vous" />
       <div className="glass-panel p-4">
         <AppointmentsView events={events} />
       </div>
