@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
   { label: "Contacts", href: "/dashboard/contacts", icon: Users },
-  { label: "Deals", href: "/dashboard/deals", icon: Briefcase },
+  { label: "Opportunités", href: "/dashboard/deals", icon: Briefcase },
   { label: "Agenda", href: "/dashboard/appointments", icon: Calendar },
   { label: "Tâches", href: "/dashboard/tasks", icon: CheckSquare },
 ];
@@ -29,7 +29,7 @@ export function Sidebar() {
       <div className="mb-10 px-2">
         <Link href="/dashboard" className="mb-10 px-2">
           <Image
-            src="/images/logo_crm.jpg"
+            src="/images/logo_crm.png"
             alt="Logo CRM"
             width={110}
             height={72}

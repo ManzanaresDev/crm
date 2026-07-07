@@ -22,7 +22,7 @@ export default async function DealsPage() {
 
   return (
     <div className="min-h-screen p-6 md:p-10">
-      <PageHeader title="Pipeline" />
+      <PageHeader title="Opportunités" />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {STAGES.map((stage) => {

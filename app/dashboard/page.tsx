@@ -1,7 +1,6 @@
 // app/dashboard/page.tsx
 import { db } from "@/lib/database";
 import { requireSession } from "@/lib/require-session";
-import { MobileNav } from "@/components/ui/MobileNav";
 import { StatCard } from "@/components/ui/StartCard";
 import { Users, Target, Trophy, Wallet, AlertTriangle } from "lucide-react";
 
